@@ -1,7 +1,7 @@
 # fastai2-vision-app
 
 
-Deployment ready starter pack for creating fast responsive Web App for fastai2 Vision models using Starlette.io framework with Uvicorn ASGI server.
+Deployment ready starter pack template for creating fast responsive Web App for fastai2 Vision models using Starlette.io framework with Uvicorn ASGI server.
 
 Everything packaged in docker with requirement.txt, so you can push it to any docker hosted cloud service. Enjoy :)
 
