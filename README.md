@@ -1,5 +1,6 @@
 # fastai2-vision-app
 
+![alt text](https://raw.githubusercontent.com/psmathur/fastai2-vision-app/master/fastai2_web_app.png)
 
 Deployment ready starter pack template for creating fast responsive Web App for fastai2 Vision models using Starlette.io framework with Uvicorn ASGI server.
 
