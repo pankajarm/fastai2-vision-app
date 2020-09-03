@@ -5,10 +5,8 @@ from starlette.middleware.cors import CORSMiddleware
 import uvicorn, aiohttp, asyncio
 from io import BytesIO
 from fastai2.vision.all import *
-# from fastai import *
 
-# model_file_url = 'https://github.com/vikbehal/FindMe/blob/master/findmyfoodexport.pkl?raw=true'
-model_file_url = 'https://github.com/vikbehal/FindMe/blob/master/export.pkl?raw=true'
+model_file_url = 'https://github.com/psmathur/pets_breeds_classifier/blob/master/pets_res_34_export.pkl?raw=true'
 model_file_name = 'export.pkl'
 path = Path(__file__).parent
 
@@ -24,7 +22,7 @@ async def download_file(url, dest):
             with open(dest, 'wb') as f: f.write(data)
 
 async def setup_learner():
-    # await download_file(model_file_url, path/'models'/f'{model_file_name}')
+    await download_file(model_file_url, path/'models'/f'{model_file_name}')
     try:
         learn = load_learner(path/'models'/model_file_name, cpu=True)
         return learn
@@ -50,7 +48,6 @@ async def upload(request):
     return predict_from_bytes(img_bytes)
 
 def predict_from_bytes(img_bytes):
-    # img = BytesIO(img_bytes)
     pred,pred_idx,probs = learn.predict(img_bytes)
     classes = learn.dls.vocab
     predictions = sorted(zip(classes, map(float, probs)), key=lambda p: p[1], reverse=True)
