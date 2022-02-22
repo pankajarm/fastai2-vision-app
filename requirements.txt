@@ -4,7 +4,7 @@ asyncio==3.4.3
 fastai2==0.0.30
 torch==1.6.0
 torchvision==0.7.0
-ipython==7.17.0
+ipython==7.31.1
 ipykernel==5.3.4
 numpy==1.19.0
 pillow>=8.1.2
