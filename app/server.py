@@ -3,12 +3,13 @@ from starlette.routing import Route
 from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
-import uvicorn, aiohttp, asyncio
+import uvicorn, aiohttp, asyncio, hashlib
 from io import BytesIO
-from fastai2.vision.all import *
+from fastai.vision.all import *
 
-model_file_url = 'https://github.com/psmathur/pets_breeds_classifier/blob/master/pets_res_34_export.pkl?raw=true'
-model_file_name = 'export.pkl'
+model_file_url = 'https://raw.githubusercontent.com/pankajarm/fastai2-vision-app/master/app/models/pets_fastai2.pkl'
+model_file_name = 'pets_fastai2.pkl'
+MODEL_SHA256 = '60153562a20a80c0d336763eb129a441c4d6f919a5e1e45fe34a492ddb172b03'
 path = Path(__file__).parent
 
 app = Starlette()
@@ -22,10 +23,21 @@ async def download_file(url, dest):
             data = await response.read()
             with open(dest, 'wb') as f: f.write(data)
 
+def _sha256(file_path):
+    h = hashlib.sha256()
+    with open(file_path, 'rb') as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 async def setup_learner():
-    await download_file(model_file_url, path/'models'/f'{model_file_name}')
+    model_path = path/'models'/f'{model_file_name}'
+    await download_file(model_file_url, model_path)
+    if _sha256(model_path) != MODEL_SHA256:
+        raise RuntimeError('Model checksum mismatch - refusing to load')
     try:
-        learn = load_learner(path/'models'/model_file_name, cpu=True)
+        learn = load_learner(model_path, cpu=True)
         return learn
     except RuntimeError as e:
         if len(e.args) > 0 and 'CPU-only machine' in e.args[0]:
@@ -48,7 +60,7 @@ async def upload(request):
     return predict_from_bytes(img_bytes)
 
 def predict_from_bytes(img_bytes):
-    pred,pred_idx,probs = learn.predict(img_bytes)
+    pred,pred_idx,probs = learn.predict(PILImage.create(img_bytes))
     classes = learn.dls.vocab
     predictions = sorted(zip(classes, map(float, probs)), key=lambda p: p[1], reverse=True)
     result_html1 = path/'static'/'result1.html'
